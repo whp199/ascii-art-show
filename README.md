@@ -91,6 +91,17 @@ While the slideshow is running, you can use the following keys:
 *   `i`: Toggle the information HUD.
 *   `q`: Quit the application.
 
+### Mandelbrot Controls
+
+When the `mandelbrot` module is active, you can use the following keys to explore the fractal:
+
+*   `w`: Pan up.
+*   `s`: Pan down.
+*   `a`: Pan left.
+*   `d`: Pan right.
+*   `+` or `=`: Zoom in.
+*   `-`: Zoom out.
+
 ## Adding New Art Modules
 
 To add a new art module, you need to:

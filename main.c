@@ -251,6 +251,11 @@ void draw_hud(double time_left, int current_module_index, double fps) {
 
 int handle_input(int current_index) {
     int c = term_get_key();
+    if (c != -1) {
+        if (art_modules[current_index].handle_input) {
+            art_modules[current_index].handle_input(c);
+        }
+    }
     switch (c) {
         case 'q': return -2; // Quit signal
         case 'p': is_paused = !is_paused; break;

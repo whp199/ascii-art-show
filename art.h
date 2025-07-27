@@ -16,6 +16,8 @@ typedef struct {
     void (*draw)(ScreenBuffer *buffer, ColorPalette* palette);
     // Called once when the module becomes inactive
     void (*destroy)();
+    // Called on key press for module-specific interaction
+    void (*handle_input)(int key);
 } ArtModule;
 
 #endif // ART_H

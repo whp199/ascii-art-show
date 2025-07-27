@@ -1,20 +1,35 @@
 #include "art.h"
+#include "terminal.h"
 #include <math.h>
 
-static double current_re, current_im, range;
+static double current_re = -0.5, current_im = 0.0, range = 4.0;
 
-static double lerp(double a, double b, double t) { return a + t * (b - a); }
+void mandelbrot_handle_input(int key) {
+    switch (key) {
+        case 'w':
+            current_im -= range * 0.1;
+            break;
+        case 's':
+            current_im += range * 0.1;
+            break;
+        case 'a':
+            current_re -= range * 0.1;
+            break;
+        case 'd':
+            current_re += range * 0.1;
+            break;
+        case '=': // Zoom in
+        case '+':
+            range *= 0.9;
+            break;
+        case '-': // Zoom out
+            range *= 1.1;
+            break;
+    }
+}
 
 void mandelbrot_update(double progress, double time_elapsed) {
-    (void)time_elapsed;
-    const double start_re = -0.5, end_re = -0.743643887037151;
-    const double start_im = 0.0, end_im = 0.131825904205330;
-    const double start_range = 4.0, end_range = 0.000002;
-    double t = progress * progress * (3.0 - 2.0 * progress);
-
-    current_re = lerp(start_re, end_re, t);
-    current_im = lerp(start_im, end_im, t);
-    range = lerp(start_range, end_range, t);
+    (void)progress; (void)time_elapsed; // No-op
 }
 
 void mandelbrot_draw(ScreenBuffer *buffer, ColorPalette* palette) {
@@ -48,5 +63,6 @@ ArtModule get_mandelbrot_module() {
         .update = mandelbrot_update,
         .draw = mandelbrot_draw,
         .destroy = NULL,
+        .handle_input = mandelbrot_handle_input,
     };
 }
