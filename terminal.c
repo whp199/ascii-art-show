@@ -65,7 +65,7 @@ int term_has_resized() {
 }
 
 int term_get_key() {
-    int c;
+    char c;
     if (read(STDIN_FILENO, &c, 1) == 1) {
         if (c == '\x1b') { // Escape sequence
             char seq[3];
@@ -85,4 +85,3 @@ int term_get_key() {
     }
     return -1; // No key pressed
 }
-

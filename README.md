@@ -47,7 +47,24 @@ You can customize the slideshow with the following command-line options:
 | `--start-with <name>` | `-s`  | Start the slideshow with a specific module.           |         |
 | `--random`            | `-r`  | Randomize the order of the art modules.               |         |
 | `--image <path>`      | `-i`  | Specify the path to an image for the `image` module.  |         |
+| `--palette <name>`    | `-p`  | Choose a color palette (e.g., `default`, `pastel`).   | `default` |
+| `--single`            | `-S`  | Display a single module without the slideshow.        |         |
 | `--help`              | `-h`  | Display the help message and exit.                    |         |
+
+### Configuration File
+
+You can also configure the application using a configuration file located at `~/.config/ascii-art-show/config`. The file uses a simple INI format.
+
+Here are the available settings:
+
+```ini
+[slideshow]
+duration = 15
+fps = 30
+palette = vaporwave
+```
+
+Command-line arguments will always override the settings in the configuration file.
 
 ### Examples
 

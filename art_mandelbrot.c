@@ -17,7 +17,7 @@ void mandelbrot_update(double progress, double time_elapsed) {
     range = lerp(start_range, end_range, t);
 }
 
-void mandelbrot_draw(ScreenBuffer *buffer) {
+void mandelbrot_draw(ScreenBuffer *buffer, ColorPalette* palette) {
     int max_iter = 128;
     for (int row = 0; row < buffer->height; row++) {
         for (int col = 0; col < buffer->width; col++) {
@@ -32,10 +32,8 @@ void mandelbrot_draw(ScreenBuffer *buffer) {
                 iteration++;
             }
             if (iteration < max_iter) {
-                int color_val = (iteration * 12) % 230 + 16;
-                Color c = {(unsigned char)(sin(0.1 * color_val) * 127 + 128),
-                           (unsigned char)(sin(0.1 * color_val + 2) * 127 + 128),
-                           (unsigned char)(sin(0.1 * color_val + 4) * 127 + 128)};
+                float t = (float)iteration / max_iter;
+                Color c = get_palette_color(palette, t);
                 buffer_draw_char(col, row, '.', c, (Color){0,0,0});
             }
         }

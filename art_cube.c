@@ -6,7 +6,7 @@ typedef struct { float x, y, z; } Point3D;
 static Point3D points[8];
 static float angle_x = 0, angle_y = 0;
 
-void cube_init(int width, int height) {
+void cube_init(int width, int height, ColorPalette* palette) {
     (void)width; (void)height;
     int i = 0;
     for (int x = -1; x <= 1; x += 2)
@@ -21,7 +21,7 @@ void cube_update(double progress, double time_elapsed) {
     angle_y = time_elapsed * 0.3f;
 }
 
-void cube_draw(ScreenBuffer *buffer) {
+void cube_draw(ScreenBuffer *buffer, ColorPalette* palette) {
     Point3D transformed[8];
     for (int i = 0; i < 8; i++) {
         // Rotate Y
@@ -41,7 +41,7 @@ void cube_draw(ScreenBuffer *buffer) {
         projected[i][1] = (int)(transformed[i].y / z * buffer->height * 0.5 + buffer->height / 2);
     }
 
-    Color c = {200, 200, 255};
+    Color c = palette->colors[0];
     for (int i = 0; i < 4; i++) {
         // Draw lines connecting the front and back faces of the cube
         buffer_draw_line(projected[i][0], projected[i][1], projected[i+4][0], projected[i+4][1], '#', c);

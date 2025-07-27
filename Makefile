@@ -16,7 +16,9 @@ SRCS = main.c \
        art_gameoflife.c \
        art_cube.c \
        art_clock.c \
-       art_image.c
+       art_image.c \
+       config.c \
+       ini.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)

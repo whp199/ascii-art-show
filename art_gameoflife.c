@@ -5,7 +5,7 @@
 static int *world;
 static int *next_world;
 
-void gol_init(int width, int height) {
+void gol_init(int width, int height, ColorPalette* palette) {
     world = malloc(width * height * sizeof(int));
     next_world = malloc(width * height * sizeof(int));
     for (int i = 0; i < width * height; i++) {
@@ -47,10 +47,10 @@ void gol_update(double progress, double time_elapsed) {
     memcpy(world, next_world, width * height * sizeof(int));
 }
 
-void gol_draw(ScreenBuffer *buffer) {
+void gol_draw(ScreenBuffer *buffer, ColorPalette* palette) {
     for (int i = 0; i < buffer->width * buffer->height; i++) {
         if (world[i]) {
-            buffer_draw_char(i % buffer->width, i / buffer->width, '#', (Color){100, 255, 100}, (Color){0,0,0});
+            buffer_draw_char(i % buffer->width, i / buffer->width, '#', palette->colors[0], (Color){0,0,0});
         }
     }
 }

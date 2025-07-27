@@ -7,7 +7,7 @@ typedef struct { float x, y, z; } Star;
 static Star stars[NUM_STARS];
 static float speed;
 
-void starfield_init(int width, int height) {
+void starfield_init(int width, int height, ColorPalette* palette) {
     for (int i = 0; i < NUM_STARS; i++) {
         stars[i].x = (rand() % width) - width / 2;
         stars[i].y = (rand() % height) - height / 2;
@@ -28,7 +28,7 @@ void starfield_update(double progress, double time_elapsed) {
     }
 }
 
-void starfield_draw(ScreenBuffer *buffer) {
+void starfield_draw(ScreenBuffer *buffer, ColorPalette* palette) {
     for (int i = 0; i < NUM_STARS; i++) {
         if (stars[i].z > 0) {
             int sx = (int)(stars[i].x / (stars[i].z * 0.005)) + buffer->width / 2;
@@ -36,10 +36,10 @@ void starfield_draw(ScreenBuffer *buffer) {
 
             if (sx >= 0 && sx < buffer->width && sy >= 0 && sy < buffer->height) {
                 float dist_ratio = stars[i].z / buffer->width;
-                char character = '.'; Color c = {100, 100, 100};
-                if (dist_ratio < 0.2) { character = '@'; c = (Color){255, 255, 255}; }
-                else if (dist_ratio < 0.5) { character = '*'; c = (Color){200, 200, 200}; }
-                else if (dist_ratio < 0.8) { character = '+'; c = (Color){150, 150, 150}; }
+                char character = '.'; Color c = palette->colors[3];
+                if (dist_ratio < 0.2) { character = '@'; c = palette->colors[0]; }
+                else if (dist_ratio < 0.5) { character = '*'; c = palette->colors[1]; }
+                else if (dist_ratio < 0.8) { character = '+'; c = palette->colors[2]; }
                 buffer_draw_char(sx, sy, character, c, (Color){0,0,0});
             }
         }

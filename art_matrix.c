@@ -10,7 +10,7 @@ static Color current_color;
 
 static double lerp(double a, double b, double t) { return a + t * (b - a); }
 
-void matrix_init(int width, int height) {
+void matrix_init(int width, int height, ColorPalette* palette) {
     num_drops = width < MAX_DROPS ? width : MAX_DROPS;
     for (int i = 0; i < num_drops; i++) {
         drops[i].x = rand() % width;
@@ -38,7 +38,7 @@ void matrix_update(double progress, double time_elapsed) {
     }
 }
 
-void matrix_draw(ScreenBuffer *buffer) {
+void matrix_draw(ScreenBuffer *buffer, ColorPalette* palette) {
     // Dim the screen
     for(int i = 0; i < buffer->width * buffer->height; i++) {
         if (rand() % 10 > 7) buffer->cells[i].character = ' ';
@@ -49,7 +49,7 @@ void matrix_draw(ScreenBuffer *buffer) {
         for (int j = 0; j < drops[i].len; j++) {
             int y = head_y - j;
             if (y >= 0 && y < buffer->height && drops[i].x < buffer->width) {
-                Color c = current_color;
+                Color c = palette->colors[0];
                 c.g = (unsigned char)((float)c.g * (1.0f - (float)j / drops[i].len));
                  buffer_draw_char(drops[i].x, y, ' ' + (rand() % 94), c, (Color){0,0,0});
             }

@@ -20,6 +20,7 @@
 #include "buffer.h"
 #include "art.h"
 #include "art_image.h"
+#include "config.h"
 
 // --- Main Application State ---
 static int slide_duration = 20;
@@ -51,6 +52,16 @@ void draw_hud(double time_left, int current_module_index, double fps);
 int handle_input(int current_index);
 
 int main(int argc, char **argv) {
+    Configuration config = { .duration = 20, .fps = 25 };
+    strcpy(config.palette, "default");
+    load_config(&config);
+
+    slide_duration = config.duration;
+    target_fps = config.fps;
+
+    slide_duration = config.duration;
+    target_fps = config.fps;
+
     // Populate the art modules array now that we are in a function
     populate_modules();
 
@@ -66,11 +77,15 @@ int main(int argc, char **argv) {
         {"start-with",  required_argument, 0, 's'},
         {"random",      no_argument,       0, 'r'},
         {"image",       required_argument, 0, 'i'},
+        {"palette",     required_argument, 0, 'p'},
+        {"single",      no_argument,       0, 'S'},
         {"help",        no_argument,       0, 'h'},
         {0, 0, 0, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "d:f:ls:ri:h", long_options, NULL)) != -1) {
+    int single_mode = 0;
+
+    while ((opt = getopt_long(argc, argv, "d:f:ls:ri:p:Sh", long_options, NULL)) != -1) {
         switch (opt) {
             case 'd': slide_duration = atoi(optarg); break;
             case 'f': target_fps = atoi(optarg); break;
@@ -84,6 +99,8 @@ int main(int argc, char **argv) {
                 }
                 break;
             case 'i': image_set_path(optarg); break;
+            case 'p': strncpy(config.palette, optarg, sizeof(config.palette) - 1); break;
+            case 'S': single_mode = 1; break;
             case 'r': randomize_order = 1; break;
             case 'h': print_usage(argv[0]); return 0;
             default: print_usage(argv[0]); return 1;
@@ -111,7 +128,7 @@ int main(int argc, char **argv) {
     while (1) {
         ArtModule *current_module = &art_modules[current_module_index];
         if (current_module->init) {
-            current_module->init(term_get_width(), term_get_height());
+            current_module->init(term_get_width(), term_get_height(), get_current_palette());
         }
 
         struct timespec slide_start_time;
@@ -129,7 +146,7 @@ int main(int argc, char **argv) {
             if (term_has_resized()) {
                 resize_buffer(term_get_width(), term_get_height());
                 if (current_module->destroy) current_module->destroy();
-                if (current_module->init) current_module->init(term_get_width(), term_get_height());
+                if (current_module->init) current_module->init(term_get_width(), term_get_height(), get_current_palette());
             }
 
             int new_index = handle_input(current_module_index);
@@ -149,7 +166,7 @@ int main(int argc, char **argv) {
 
             buffer_clear();
             if (current_module->draw) {
-                current_module->draw(get_buffer());
+                current_module->draw(get_buffer(), get_current_palette());
             }
 
             if (show_info_hud) {
@@ -160,7 +177,7 @@ int main(int argc, char **argv) {
             last_frame_time = current_time;
 
             // Check for next slide
-            if (elapsed_slide_seconds >= slide_duration) {
+            if (!single_mode && elapsed_slide_seconds >= slide_duration) {
                 current_module_index = (current_module_index + 1) % num_art_modules;
                 break;
             }

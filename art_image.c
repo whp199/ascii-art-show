@@ -21,7 +21,7 @@ void image_set_path(const char *path) {
     image_path = path;
 }
 
-void image_init(int width, int height) {
+void image_init(int width, int height, ColorPalette* palette) {
     (void)width; // Unused
     (void)height; // Unused
     image_data = stbi_load(image_path, &image_width, &image_height, &image_channels, 3);
@@ -30,7 +30,7 @@ void image_init(int width, int height) {
     }
 }
 
-void image_draw(ScreenBuffer *buffer) {
+void image_draw(ScreenBuffer *buffer, ColorPalette* palette) {
     if (image_data == NULL) {
         buffer_draw_text(1, 1, "Error: Could not load image.", (Color){255, 0, 0}, (Color){0, 0, 0});
         return;
