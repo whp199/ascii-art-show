@@ -12,10 +12,26 @@ This is a terminal-based slideshow application that displays various animated an
     *   Conway's Game of Life
     *   3D Spinning Cube
     *   Digital Clock
-    *   Image Viewer
+    *   Image Viewer (Sixel)
+    *   Magic: The Gathering card viewer (Sixel)
 *   Command-line options to customize the slideshow.
 *   Interactive controls to pause, navigate, and quit.
 *   Dynamic resizing to fit the terminal window.
+*   Sixel support for high-resolution image display in compatible terminals.
+
+## Dependencies
+
+Before building, you need to install the development libraries for `libsixel` and `libcurl`.
+
+On Debian/Ubuntu-based systems:
+```bash
+sudo apt-get install libsixel-dev libcurl4-openssl-dev
+```
+
+On Fedora/RHEL-based systems:
+```bash
+sudo dnf install libsixel-devel libcurl-devel
+```
 
 ## Building the Project
 
@@ -76,9 +92,13 @@ Command-line arguments will always override the settings in the configuration fi
     ```bash
     ./ascii-art-show -s cube
     ```
-*   Display a specific image:
+*   Display a specific image using Sixel:
     ```bash
     ./ascii-art-show -s image -i /path/to/your/image.png
+    ```
+*   Show a random Magic: The Gathering card:
+    ```bash
+    ./ascii-art-show -s mtg-sixel
     ```
 
 ## Interactive Controls
@@ -110,3 +130,7 @@ To add a new art module, you need to:
 2.  Implement the `ArtModule` interface (see `art.h`).
 3.  Add the module to the `Makefile`.
 4.  Add the module to the `art_modules` array in `main.c`.
+
+## Acknowledgements
+
+This project was significantly improved with the help of Gemini, a large language model from Google.

@@ -2,8 +2,8 @@
 
 # Compiler and flags
 CC = gcc
-CFLAGS = -Wall -Wextra -O2 -std=c11
-LDFLAGS = -lm
+CFLAGS = -Wall -Wextra -O2 -std=c11 -I/usr/include/sixel
+LDFLAGS = -lm -lcurl -lsixel -lsixel
 
 # Source files
 SRCS = main.c \
@@ -18,7 +18,9 @@ SRCS = main.c \
        art_clock.c \
        art_image.c \
        config.c \
-       ini.c
+       ini.c \
+       art_mtg.c \
+       art_mtg_sixel.c
 
 # Object files
 OBJS = $(SRCS:.c=.o)

@@ -21,6 +21,8 @@
 #include "art.h"
 #include "art_image.h"
 #include "config.h"
+#include "art_mtg.h"
+#include "art_mtg_sixel.h"
 
 // --- Main Application State ---
 static int slide_duration = 20;
@@ -38,9 +40,11 @@ ArtModule get_gameoflife_module();
 ArtModule get_cube_module();
 ArtModule get_clock_module();
 ArtModule get_image_module();
+ArtModule get_mtg_module();
+ArtModule get_mtg_sixel_module();
 
 // We declare the array here, but initialize it in main()
-static ArtModule art_modules[8];
+static ArtModule art_modules[9];
 const int num_art_modules = sizeof(art_modules) / sizeof(ArtModule);
 
 // --- Function Prototypes ---
@@ -55,9 +59,6 @@ int main(int argc, char **argv) {
     Configuration config = { .duration = 20, .fps = 25 };
     strcpy(config.palette, "default");
     load_config(&config);
-
-    slide_duration = config.duration;
-    target_fps = config.fps;
 
     slide_duration = config.duration;
     target_fps = config.fps;
@@ -127,6 +128,10 @@ int main(int argc, char **argv) {
 
     while (1) {
         ArtModule *current_module = &art_modules[current_module_index];
+        int is_sixel_module = (strcmp(current_module->name, "image") == 0 || strcmp(current_module->name, "mtg-sixel") == 0);
+        int is_static_sixel = is_sixel_module; // For now, treat both as static
+        int drawn = 0;
+
         if (current_module->init) {
             current_module->init(term_get_width(), term_get_height(), get_current_palette());
         }
@@ -135,6 +140,20 @@ int main(int argc, char **argv) {
         clock_gettime(CLOCK_MONOTONIC, &slide_start_time);
 
         while (1) {
+            if (is_static_sixel && drawn) {
+                // For static sixel images, we've drawn it once. Now just wait for input.
+                int new_index = handle_input(current_module_index);
+                if (new_index == -2) goto cleanup; // Quit
+                if (new_index != current_module_index) {
+                    current_module_index = new_index;
+                    break;
+                }
+                // Sleep to prevent busy-waiting
+                struct timespec sleep_time = {0, 10000000}; // 10ms
+                nanosleep(&sleep_time, NULL);
+                continue;
+            }
+
             // Timing
             struct timespec current_time;
             clock_gettime(CLOCK_MONOTONIC, &current_time);
@@ -147,6 +166,7 @@ int main(int argc, char **argv) {
                 resize_buffer(term_get_width(), term_get_height());
                 if (current_module->destroy) current_module->destroy();
                 if (current_module->init) current_module->init(term_get_width(), term_get_height(), get_current_palette());
+                drawn = 0; // Redraw after resize
             }
 
             int new_index = handle_input(current_module_index);
@@ -164,16 +184,24 @@ int main(int argc, char **argv) {
                 }
             }
 
-            buffer_clear();
+            if (!is_sixel_module) {
+                buffer_clear();
+            }
+
             if (current_module->draw) {
                 current_module->draw(get_buffer(), get_current_palette());
+                if (is_static_sixel) {
+                    drawn = 1;
+                }
             }
 
             if (show_info_hud) {
                 draw_hud(slide_duration - elapsed_slide_seconds, current_module_index, 1.0/elapsed_frame_seconds);
             }
 
-            buffer_flush();
+            if (!is_sixel_module) {
+                buffer_flush();
+            }
             last_frame_time = current_time;
 
             // Check for next slide
@@ -210,6 +238,11 @@ void populate_modules() {
     art_modules[5] = get_cube_module();
     art_modules[6] = get_clock_module();
     art_modules[7] = get_image_module();
+    if (is_sixel_supported()) {
+        art_modules[8] = get_mtg_sixel_module();
+    } else {
+        art_modules[8] = get_mtg_module();
+    }
 }
 
 void print_usage(const char *prog_name) {
